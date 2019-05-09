@@ -1,7 +1,7 @@
 ---
 - hosts: frontend
   vars:
-    http_port: 80
+    http_port: 801
     max_clients: 200
   remote_user: vagrant
   become: true
@@ -11,15 +11,23 @@
       name: httpd
       state: present
     notify: restart server
+  - name: copiar fichero
+    copy: src=/home/ansible/hola.txt dest=/home/vagrant/
+    notify: restart server
+  - name: Actualizar httpd.conf custom
+    template:
+      src: templates/httpd.conf.j2
+      dest: /etc/httpd/conf/httpd.conf
+    notify: restart Apache
   - name: Inicar servicio en el arranque
     service:
       name: httpd
       state: started
       enabled: yes
     notify: restart httpd
-  - name: copiar fichero
-    copy: src=/home/ansible/hola.txt dest=/home/vagrant/
-    notify: restart server
   handlers:
-  - name: restart server
-    command: "touch /tmp/archivos.txt"
+  - name: restart Apache
+    service:
+      name: httpd
+      state: restarted
+      
