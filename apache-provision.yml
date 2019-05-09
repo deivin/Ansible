@@ -1,0 +1,25 @@
+---
+- hosts: frontend
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: vagrant
+  become: true
+  tasks:
+  - name: Actualizacion de Apache - latest version
+    package:
+      name: httpd
+      state: present
+    notify: restart server
+  - name: Inicar servicio en el arranque
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+    notify: restart httpd
+  - name: copiar fichero
+    copy: src=/home/ansible/hola.txt dest=/home/vagrant/
+    notify: restart server
+  handlers:
+  - name: restart server
+    command: "touch /tmp/archivos.txt"
